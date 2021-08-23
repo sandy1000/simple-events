@@ -17,7 +17,6 @@ Author URI: http://sandeepstha.com
  */
 class PT_Simple_Events {
 	public function __construct() {
-        include_once plugin_dir_path(__FILE__) . 'inc/admin/Settings.php';
         include_once plugin_dir_path(__FILE__) . 'inc/admin/Custom-fields.php';
         include_once plugin_dir_path(__FILE__) . 'inc/public/shortcodes.php';
         include_once plugin_dir_path(__FILE__) . 'inc/Plugin.php';
