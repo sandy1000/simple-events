@@ -30,6 +30,12 @@ class Plugin{
     public function __construct($file)
     {
         add_action('wp_enqueue_scripts', [$this,'wp_enqueue_scripts',], 500);
+        add_action('rest_api_init', function () {
+        register_rest_route( 'pt-simple-event/v1', 'latest-posts/paged/(?P<page>\d+)',array(
+                          'methods'  => 'GET',
+                          'callback' => [$this,'get_latest_events']
+                ));
+          });
         load_plugin_textdomain(self::TEXTDOMAIN, false, self::p_dir('languages/'));
         self::$file     = $file;
         self::$instance = new \stdClass();
@@ -85,6 +91,33 @@ class Plugin{
         return plugins_url(trim($path, '/'), self::$file);
     }
 
+
+
+    // adding rest endpoint
+    /**
+     * @param $request
+     */
+    public function get_latest_events($request){
+
+        $posts_per_page = 10;
+        $offset  = ($request['page'] * $posts_per_page) - $posts_per_page;
+        $args = array(
+                'post_type'      => 'simple_event',
+                'posts_per_page' => $posts_per_page,
+                'offset' => $offset
+        );
+
+        $posts = get_posts($args);
+        if (empty($posts)) {
+        return new \WP_Error( 'empty_posts', 'There are no events to display', array('status' => 404) );
+
+        }
+
+        $response = new \WP_REST_Response($posts);
+        $response->set_status(200);
+
+        return $response;
+    }
 
     public function wp_enqueue_scripts() {
         wp_register_style('pt-simple-events', self::p_url( 'assets/css/style.css', __FILE__ ) , '', self::VERSION, true);
