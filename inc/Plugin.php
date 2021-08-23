@@ -89,6 +89,11 @@ class Plugin{
     public function wp_enqueue_scripts() {
         wp_register_style('pt-simple-events', self::p_url( 'assets/css/style.css', __FILE__ ) , '', self::VERSION, true);
         wp_register_script('pt-simple-events', self::p_url( 'assets/js/scripts.js', __FILE__ ), ['jquery'], self::VERSION, true);
+        wp_localize_script('pt-simple-events', 'pt_site_global',
+                [
+                    'ajax_url'  => admin_url('admin-ajax.php'),
+                ]
+            );
     }
 
 }

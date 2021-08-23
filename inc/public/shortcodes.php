@@ -10,6 +10,8 @@ class Shortcodes{
     public function __construct() {
         add_shortcode( 'pt_listevents', [$this,'pt_shortcode_displ_eventlist'] );
         add_shortcode( 'pt_event_filter', [$this,'pt_shortcode_filter_event'] );
+        add_action( 'wp_ajax_getFilteredEventList', [$this,'getFilteredEventList'] );
+        add_action( 'wp_ajax_nopriv_getFilteredEventList', [$this,'getFilteredEventList'] );
     }
 
     // Creating Shortcodes to display events [pt_listevents num="2" type="webinar"]
@@ -74,7 +76,7 @@ class Shortcodes{
                 $custom_query->the_post();
 
                 // This is the output for your entry so what you want to do for each post.
-                $output .= '<div class="event"><a href="'.$type.get_permalink().'">' . get_the_title() . '</a><br /><span>'.get_post_meta( get_the_ID(), '_simple_event_date', true ).', '.get_post_meta( get_the_ID(), '_simple_event_venue', true ).'</span></div>';
+                $output .= '<div class="event"><a href="'.get_permalink().'">' . get_the_title() . '</a><br /><span>'.get_post_meta( get_the_ID(), '_simple_event_date', true ).', '.get_post_meta( get_the_ID(), '_simple_event_venue', true ).'</span></div>';
 
             }
 
@@ -104,19 +106,108 @@ class Shortcodes{
          if ( ! empty( $event_types ) && ! is_wp_error( $event_types ) ){
              $output .= '<select name="se_event_type"><option value="-1">'.__('select type','pt-simple-event').'</option>';
              foreach ( $event_types as $term ) {
-                 $output .= '<option value="'.$term->name.'">'.$term->name.'</option>';
+                 $output .= '<option value="'.$term->slug.'">'.$term->name.'</option>';
              }
              $output .=  '</select>';
         }                 
                 
         $output .= '<input type="date" name="se_event_date" />';       
-        $output .= '</div>';
-
-        $output .='<div class="simple_event_filter_lists"></div>';
+        $output .= '</div><div class="simple_event_filters"></div>';
 
         wp_enqueue_style('pt-simple-events');
         wp_enqueue_script('pt-simple-events');
         return $output;
+     }
+
+
+     public function getFilteredEventList(){
+
+        if(isset($_POST)){
+
+        // Define query
+        $curent_date = current_time( 'Y-m-d' );
+        $query_args = array(
+            'post_type'      => 'simple_event',
+            'posts_per_page' => 10,
+            'order'          => 'ASC',
+            'orderby'        => '_simple_event_date',
+        );
+
+        // Event by term if defined
+        if (isset($_POST['eventType']) && $_POST['eventType'] != '-1') {
+
+            $query_args['tax_query'] = array(
+                array(
+                    'taxonomy' => 'simple_event_type',
+                    'field'    => 'slug',
+                    'terms'    => sanitize_text_field($_POST['eventType']),
+                ),
+            );
+
+        }
+
+
+        // Event by date if defined
+        if (isset($_POST['eventDate']) && $_POST['eventDate']!='') {
+
+            $query_args['meta_query'] = array(
+                'relation'    => 'OR',
+                array(
+                    'key'     => '_simple_event_date',
+                    'value'   => sanitize_text_field($_POST['eventDate']),
+                    'compare' => '=',
+                ),
+            );
+
+        }else{
+            $query_args['meta_query'] = array(
+                'relation'    => 'OR',
+                array(
+                    'key'     => '_simple_event_date',
+                    'value'   => $curent_date,
+                    'compare' => '>=',
+                    'type'    => 'DATE',
+                ),
+            );
+        }
+
+
+        // Query posts
+        $custom_query = new \WP_Query( $query_args );
+        $output='';
+         // Add content if we found posts via our query
+         if ( $custom_query->have_posts() ) {
+
+            // Open div wrapper around loop
+            $output .= '<div class="event_lists">';
+
+            // Loop through posts
+            while ( $custom_query->have_posts() ) {
+
+                // Sets up post data
+                $custom_query->the_post();
+
+                // This is the output for your entry so what you want to do for each post.
+                $output .= '<div class="event"><a href="'.get_permalink().'">' . get_the_title() . '</a><br /><span>'.get_post_meta( get_the_ID(), '_simple_event_date', true ).', '.get_post_meta( get_the_ID(), '_simple_event_venue', true ).'</span></div>';
+
+            }
+
+            // Close div wrapper around loop
+            $output .= '</div>';
+
+            // Restore data
+            wp_reset_postdata();
+
+        }
+
+            $data = array('data'=>array(
+                                    'message'=>$output
+                                    )
+                        );
+
+            echo json_encode($data);
+        }
+        die();
      }
 
   
