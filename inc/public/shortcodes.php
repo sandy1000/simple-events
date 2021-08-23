@@ -10,13 +10,7 @@ class Shortcodes{
     public function __construct() {
         add_shortcode( 'pt_listevents', [$this,'pt_shortcode_displ_eventlist'] );
         add_shortcode( 'pt_event_filter', [$this,'pt_shortcode_filter_event'] );
-        add_action('wp_enqueue_scripts', [$this,'wp_enqueue_scripts',], 500);
     }
-
-    public function wp_enqueue_scripts(){
-        wp_enqueue_style( 'simple-events', Plugin::p_url('inc/public/style.css'),'',Plugin::VERSION);
-    }
-
 
     // Creating Shortcodes to display events [pt_listevents num="2" type="webinar"]
     public function pt_shortcode_displ_eventlist($atts){
@@ -92,6 +86,7 @@ class Shortcodes{
 
         }
 
+        wp_enqueue_style('pt-simple-events');
         // Return your shortcode output
         return $output;
 
@@ -119,6 +114,8 @@ class Shortcodes{
 
         $output .='<div class="simple_event_filter_lists"></div>';
 
+        wp_enqueue_style('pt-simple-events');
+        wp_enqueue_script('pt-simple-events');
         return $output;
      }
 

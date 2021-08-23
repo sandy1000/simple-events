@@ -29,6 +29,7 @@ class Plugin{
      */
     public function __construct($file)
     {
+        add_action('wp_enqueue_scripts', [$this,'wp_enqueue_scripts',], 500);
         load_plugin_textdomain(self::TEXTDOMAIN, false, self::p_dir('languages/'));
         self::$file     = $file;
         self::$instance = new \stdClass();
@@ -82,6 +83,12 @@ class Plugin{
      */
     public static function p_url($path = '') {
         return plugins_url(trim($path, '/'), self::$file);
+    }
+
+
+    public function wp_enqueue_scripts() {
+        wp_register_style('pt-simple-events', self::p_url( 'assets/css/style.css', __FILE__ ) , '', self::VERSION, true);
+        wp_register_script('pt-simple-events', self::p_url( 'assets/js/scripts.js', __FILE__ ), ['jquery'], self::VERSION, true);
     }
 
 }
