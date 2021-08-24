@@ -18,6 +18,7 @@ Author URI: http://sandeepstha.com
 class PT_Simple_Events {
 	public function __construct() {
         include_once plugin_dir_path(__FILE__) . 'inc/admin/Custom-fields.php';
+        include_once plugin_dir_path(__FILE__) . 'inc/admin/Gutenberg-block.php';
         include_once plugin_dir_path(__FILE__) . 'inc/public/shortcodes.php';
         include_once plugin_dir_path(__FILE__) . 'inc/Plugin.php';
         new \PT_Simple_Events\Plugin(__FILE__);

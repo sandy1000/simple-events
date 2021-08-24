@@ -30,17 +30,20 @@ class Plugin{
     public function __construct($file)
     {
         add_action('wp_enqueue_scripts', [$this,'wp_enqueue_scripts',], 500);
+
         add_action('rest_api_init', function () {
         register_rest_route( 'pt-simple-event/v1', 'latest-posts/paged/(?P<page>\d+)',array(
                           'methods'  => 'GET',
                           'callback' => [$this,'get_latest_events']
                 ));
           });
+
         load_plugin_textdomain(self::TEXTDOMAIN, false, self::p_dir('languages/'));
         self::$file     = $file;
         self::$instance = new \stdClass();
         self::$instance->cfields   = new \PT_Simple_Events\Meta_Fields();
         self::$instance->shortcodes   = new \PT_Simple_Events\Shortcodes();
+        self::$instance->guternberg   = new \PT_Simple_Events\Gutenberg_Block();
         add_action('init', [$this, 'init']);
         
     }
@@ -57,6 +60,7 @@ class Plugin{
             'label'     => __( 'Event', 'pt-simple-event' ),
             'menu_icon' => 'dashicons-book',
             'supports'  => array( 'title', 'editor', 'author', 'thumbnail'),
+            'show_in_rest'       => true,
         );
         register_post_type( 'simple_event', $args );
 
