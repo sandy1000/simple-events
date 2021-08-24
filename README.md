@@ -20,3 +20,8 @@ Custom rest route
 /wp-json/pt-simple-event/v1/latest-posts/paged/1
 
 where 1 is the page number
+
+
+== Guternberg Block ==
+
+Block simple slider added, work on progress
