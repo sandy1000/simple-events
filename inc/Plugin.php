@@ -81,11 +81,11 @@ class Plugin{
         register_taxonomy( 'simple_event_type', 'simple_event', $args );
     }
 
-      /**
+       /**
      * @param $path
      */
     public static function p_dir($path = '') {
-        return trailingslashit(dirname(self::$file)) . trim($path, '/');
+        return dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/'.$path;
     }
 
     /**
