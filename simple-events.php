@@ -4,7 +4,7 @@
 
 Plugin Name: Simple Events
 Plugin URI: http://sandeepstha.com/
-Description: Simple Events plugin by OUTSIDE.
+Description: Simple Events plugin.
 Version: 1.0.0
 Text Domain: pt-simple-event
 Author: Sandeep Shrestha
